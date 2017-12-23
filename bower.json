@@ -1,0 +1,26 @@
+{
+  "name": "dong",
+  "version": "0.0.1",
+  "authors": [
+    "Huyin"
+  ],
+  "description": "stock",
+  "keywords": [
+    "stock"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "jquery": "1.12.4",
+    "bootstrap": "3.3.5",
+    "angular": "~1.4.5",
+    "angular-animate": "~1.4.5",
+    "angular-ui-router": "~0.2.15",
+    "angular-datatables": "0.4.0",
+    "font-awesome-animation": "0.0.7",
+    "underscore": "1.8.3",
+    "datatables.net-select": "1.2.0",
+    "qtip2": "2.1",
+    "highcharts": "5.0.6",
+    "eonasdan-bootstrap-datetimepicker": "^4.17.47"
+  }
+}

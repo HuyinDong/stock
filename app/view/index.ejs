@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Stock Tracking</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <!-- Bootstrap 3.3.6 -->
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/lib/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
+    <!-- Font Awesome -->
+
+    <link rel="stylesheet" href="/css/AdminLTE.min.css">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="/lib/datatables/media/css/jquery.dataTables.min.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+    <style>
+        .myCustomClass {
+            border-color: rgb(0, 190, 0);
+            background-color: #ddd;
+            width: 250px;
+            height: 250px;
+        }
+
+        .myCustomClass .qtip-content {
+            font-size: 12px;
+        }
+
+        .qtip-wiki {
+            padding: 50px;
+            max-width: 385px;
+        }
+
+        .qtip-wiki p {
+            margin: 0 0 6px;
+        }
+    </style>
+                <script>
+                // Popup window code
+                function newPopup(url) {
+                    popupWindow = window.open(
+                        url, 'popUpWindow', 'height=800,width=1000,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')
+                }
+            </script>
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+
+<body class="hold-transition skin-blue layout-top-nav" ng-app='stock' ng-controller='stockCtrl'>
+    <div class="wrapper">
+
+        <header class="main-header">
+            <nav class="navbar navbar-static-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <a href="#" class="navbar-brand">Overview</a>
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+                    </div>
+
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="#">Home</a></li>
+
+                        </ul>
+
+                    </div>
+                    <!-- /.navbar-collapse -->
+                    <!-- Navbar Right Menu -->
+                    <!-- /.navbar-custom-menu -->
+                </div>
+                <!-- /.container-fluid -->
+            </nav>
+        </header>
+        <!-- Full Width Column -->
+        <div class="content-wrapper">
+            <div class="container" >
+                <!-- Content Header (Page header) -->
+                <section class="content">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="box box-info">
+                                <div class="box-header with-border">
+
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <h3 class="box-title">Menu</h3>
+                                        </div>
+                                        <div>
+                                            <div class="col-xs-3">
+
+                                              <select class="form-control" ng-model = "type">
+                                                <option ng-repeat = "t in types">{{t.type}}</option>
+                                              </select>
+                                            </div>
+                                            <div class="col-xs-3">
+                                                <input type="date" ng-model = "date" class="form-control" placeholder="Date">
+                                            </div>
+                                            <div class="col-xs-3">
+                                                <input type="button"  value="Go" class="btn btn-info btn-flat" ng-click="go()" />
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <table id="ongoing" class="table table-bordered display">
+                                        <thead>
+                                            <tr>
+                                                <th>日期</th>
+                                                <th>代码</th>
+                                                <th>名称</th>
+                                                <th>当天涨幅</th>
+                                                <th>第二天涨幅</th>
+                                                <th>第三天涨幅</th>
+                                                <th>第四天涨幅</th>
+                                                <th>第五天涨幅</th>
+                                                <th>第六天涨幅</th>
+                                                <th>第二天开盘</th>
+                                                <th>第三天最高</th>
+                                                <th>第六天收盘</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <table id="detail" class="table table-bordered display">
+         <thead>
+                                            <tr>
+                                                <th>日期</th>
+                                                <th>代码</th>
+                                                <th>名称</th>
+                                                <th>当天涨幅</th>
+                                                <th>第二天涨幅</th>
+                                                <th>第三天涨幅</th>
+                                                <th>第四天涨幅</th>
+                                                <th>第五天涨幅</th>
+                                                <th>第六天涨幅</th>
+                                                <th>第二天开盘</th>
+                                                <th>第三天最高</th>
+                                                <th>第六天收盘</th>
+                                            </tr>
+                                        </thead>
+      </table>
+
+      </div>
+
+    </div>
+  </div>
+
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="box box-info">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">History</h3>
+                                </div>
+                                <!-- /.box-header -->
+                                <div class="box-body">
+                                    <table id="example" class="table table-bordered display">
+                                        <thead>
+                                            <tr>
+                                                <th>Code</th>
+                                                <th>Name</th>
+                                                <th>Date</th>
+                                                <th>Open</th>
+                                                <th>Close</th>
+                                                <th>5 Days HHigh</th>
+                                                <th>5 Days LLow</th>
+                                                <th>Rate/Open to HHigh</th>
+                                                <th>Rate/Open to Close</th>
+                                                <th>Rate/LLow to HHigh</th>
+                                                <th>Detail</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <!-- /.container -->
+                    </div>
+                    <!-- /.content-wrapper -->
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="box box-info">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Statistics</h3>
+                                </div>
+                                <div class="box-body">
+                                    <table class="table table-bordered display">
+                                        <tr>
+                                            <td>
+                                                <strong>Total : {{statistic.total}}</strong></td>
+                                            <td>
+                                                <strong>Red : {{statistic.countO_H.Red}}, Green : {{statistic.countO_H.Green}}, Open to High Earning Rate : {{statistic.countO_H.Red/(statistic.countO_H.Red+statistic.countO_H.Green)* 100 | number:2}}%</strong></td>
+                                            <td>
+                                                <strong>Red : {{statistic.countO_C.Red}}, Green : {{statistic.countO_C.Green}}, Open to Close Earning Rate : {{statistic.countO_C.Red/(statistic.countO_C.Red+statistic.countO_C.Green)* 100 | number:2}}%</strong></td>
+                                        </tr>
+                                    </table>
+                                    <table id="statistic" class="table table-bordered display">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Names</th>
+                                                <th>Open to High Earning Rate</th>
+                                                <th>Open to Close Earning Rate</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                </section>
+
+                </div>
+              </div>
+
+                <!-- jQuery 2.1.4 -->
+                <script src="/lib/jquery/dist/jquery.min.js"></script>
+                <!-- Bootstrap 3.3.5 -->
+                <script src="/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+                <script src="/lib/angular/angular.min.js"></script>
+                <script src="/lib/angular-animate/angular-animate.min.js"></script>
+                <script src="/lib/angular-ui-router/release/angular-ui-router.js"></script>
+                <script src="/lib/datatables/media/js/jquery.dataTables.min.js"></script>
+                <script src="/lib/angular-datatables/dist/angular-datatables.min.js"></script>
+                <script src="/lib/datatables.net-select/js/dataTables.select.min.js"></script>
+                <script src="/lib/underscore/underscore-min.js"></script>
+                <script src="/lib/highcharts/highstock.js"></script>
+                <script src="/lib/highcharts/js/modules/exporting.js"></script>
+                <!-- AdminLTE App -->
+                <script src="/js/app.min.js"></script>
+                <!-- AdminLTE for demo purposes -->
+                <script src="/js/demo.js"></script>
+
+                <script>
+                    var stock = angular.module('stock', []);
+                    var dataset = [];
+                    var table;
+                    stock.controller('stockCtrl', function($scope, $http,$compile) {
+                      $http.get('/allmodels').then(function(data){
+                        console.log(data.data);
+                        $scope.types = data.data;
+                      });
+
+                      $scope.go = function(){
+                        var date = ($scope.date.getYear()+1900)+"/"+($scope.date.getMonth()+1)+"/"+$scope.date.getDate();
+                        console.log(date);
+                        $http.get('/stocks/type/date', {
+      params: {
+        type:$scope.type,
+        date :date
+      }}).then(function(data){
+
+        for(var i = 0 ; i < data.data.length; i++){
+           for(var j = 0; j<data.data[i].data.length;j++){
+             if(data.data[i].data[j].date == date){
+                data.data[i].data = data.data[i].data.slice(j,j+6);
+                break;
+             }
+           }
+           var length = data.data[i].data.length;
+           var m = 0;
+           while(m < 6-length){
+            data.data[i].data.push({rate:'null',close:'null',high:'null'});
+            m++;
+           }
+        }
+           if(table){
+          table.destroy();
+            }
+           table = $('#ongoing').DataTable({
+                          data: data.data,
+                          // order: [
+                          //     [2, "desc"]
+                          // ],
+                          "pagingType": "full_numbers",
+                          columns: [{
+                                  "data":"code",
+                                  "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+                                            $(nTd).html(date);
+                                        }
+                              },{
+                                  "data": "code"
+                              },
+                              {
+                                  "data": "name",
+                                  "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+                                    var ccode = _.find(data.data,function(ele){return ele.code == oData.code;})
+                                    var url = "JavaScript:newPopup('/detail?code=" +ccode.code + "&date="+date+"');";
+                                            $(nTd).html("<a href=" + url + ">"+oData.name+"</a>");
+                                  }
+                              },{
+                                "data":"data.0.rate"
+                              },{
+                                "data":"data.1.rate"
+                              },{
+                                "data":"data.2.rate"
+                              },{
+                                "data":"data.3.rate"
+                              },{
+                                "data":"data.4.rate"
+                              },{
+                                "data":"data.5.rate"
+                              },{
+                                "data":"data.1.open"
+                              },{
+                                "data":"data.2.high"
+                              },{
+                                "data":"data.5.close"
+                              }
+
+                          ]
+                      });
+
+
+
+                        });
+                      };
+
+                    $scope.goDetail = function(code){
+                      $('.modal-body').html(code);
+                      console.log("run");
+                        //$('.modal-body').modal('show', {backdrop: 'static'});
+                    }
+
+                    });
+                </script>
+</body>
+
+</html>

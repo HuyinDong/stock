@@ -1,0 +1,195 @@
+
+
+<html lang="en">
+<head>
+
+	<!-- start: Meta -->
+	<meta charset="utf-8">
+	<title>Smart Exploit</title>
+	<meta name="description" content="Smart Exploit">
+	<meta name="author" content="Smart Exploit">
+	<meta name="keyword" content="Smart Exploit">
+	<!-- end: Meta -->
+
+	<!-- start: Mobile Specific -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- end: Mobile Specific -->
+
+	<!-- start: CSS -->
+
+	<link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/lib/datatables/media/css/jquery.dataTables.min.css">
+		<link type="text/css" rel="stylesheet" href="/lib/qtip2/jquery.qtip.css" />
+		<style>
+			 .myCustomClass {
+					 width: 800px;
+					 height: 250px;
+			 }
+
+	 </style>
+	<!-- end: CSS -->
+
+
+	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	  	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<link id="ie-style" href="css/ie.css" rel="stylesheet">
+	<![endif]-->
+
+	<!--[if IE 9]>
+		<link id="ie9style" href="css/ie9.css" rel="stylesheet">
+	<![endif]-->
+
+	<!-- start: Favicon -->
+	<link rel="shortcut icon" href="img/favicon.ico">
+	<!-- end: Favicon -->
+
+</head>
+	<div class="container" ng-app = "stockDetail" ng-controller = "stockDetailController">
+	<hr>
+		<div class="col-md-12" align=center>
+			<table class="table table-striped">
+				<thead>
+				<tr>
+ 				  <th colspan=2>Detail:</th>
+				</tr>
+			  </thead>
+			  <tbody>
+          <tr>
+            <td> <b>Code:</b> {{data.code}}</td>
+				  <td> <b>Name:</b> {{data.name}}</td>
+				  <td> <b>Date:</b>  {{data.date}}</td>
+				</tr>
+
+
+			  </tbody>
+			</table>
+
+			<table class="table table-striped">
+				<thead>
+				<tr>
+          <th>天数</th>
+ 				  <th>开盘</th>
+ 				  <th>最高</th>
+          <th>最低</th>
+          <th>收盘</th>
+          <th>涨幅</th>
+        </tr>
+			  </thead>
+			  <tbody>
+				<tr ng-repeat= "ele in data.data">
+          <td>{{ele.date}}</td>
+          <td>{{ele.open}}</td>
+ 				  <td>{{ele.high}}</td>
+          <td>{{ele.low}}</td>
+          <td>{{ele.close}}</td>
+          <td>{{ele.rate}}</td>
+				</tr>
+
+			  </tbody>
+			</table>
+		</div>
+    <div id = "qtip1" class ="myCustomClass container">
+asdf
+    </div>
+	</div>
+
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Bootstrap 3.3.5 -->
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap 3.3.5 -->
+    <script src="/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="/lib/angular/angular.min.js"></script>
+        <script src="/lib/datatables/media/js/jquery.dataTables.min.js"></script>
+        <script src="/lib/angular-datatables/dist/angular-datatables.min.js"></script>
+        <script src="/lib/datatables.net-select/js/dataTables.select.min.js"></script>
+				<script src="/lib/qtip2/jquery.qtip.js"></script>
+        <script src="/lib/highcharts/highstock.js"></script>
+        <script src="/lib/highcharts//js/modules/exporting.js"></script>
+      <script>
+        var stockDetail = angular.module('stockDetail',[]);
+        stockDetail.controller('stockDetailController',function($scope,$http, $location){
+        var code = location.search.split('code=')[1];
+        var date = location.search.split('date=')[1];
+        $http.get('/stocks?code='+code).then(function(data){
+          console.log(data.data);
+          $scope.data = data.data[0];
+          $scope.data.date = date;
+					// for(var j = 0; j<$scope.data.data.length;j++){
+					// 	if($scope.data.data[j].date == date){
+					// 		 $scope.data.data = $scope.data.data.slice(j,j+6);
+					// 		 break;
+					// 	}
+					// }
+
+					var ohlc = [];
+					var volumn = [];
+					var groupingUnits = [
+							[
+									'week', // unit name
+									[1] // allowed multiples
+							],
+							[
+									'month', [1, 2, 3, 4, 6]
+							]
+					];
+
+					for (var i = 0; i < $scope.data.data.length; i += 1) {
+
+							var color = "";
+							if ($scope.data.data[i].open < $scope.data.data[i].close) {
+									color = "#FF0000";
+							} else if ($scope.data.data[i].open == $scope.data.data[i].close) {
+									color = "#000000";
+							} else {
+									color = "#00FF00";
+							}
+							var tempDate = $scope.data.data[i].date.split('/');
+							ohlc.push({
+									x:new Date(tempDate[0],parseInt(tempDate[1])-1,tempDate[2]),
+									open: parseFloat($scope.data.data[i].open), // open
+									high: parseFloat($scope.data.data[i].high), // high
+									low: parseFloat($scope.data.data[i].low), // low
+									close: parseFloat($scope.data.data[i].close), // close
+									color: color
+							});
+							volumn.push([new Date(tempDate[0],parseInt(tempDate[1])-1,tempDate[2]),parseFloat($scope.data.data[i].vol)]);
+					}
+					console.log(volumn);
+											Highcharts.stockChart('qtip1', {
+													title: {
+															text: $scope.data.code + "  " + $scope.data.name
+													},
+													exporting: {
+															enabled: false
+													},
+													xAxis: {
+															tickPixelInterval: 100
+													},
+													rangeSelector: {
+															enabled: false
+													},
+													navigator: {
+															enabled: false
+													},
+													scrollbar: {
+															enabled: false
+													},
+
+													series: [{
+															type: 'candlestick',
+															name: $scope.data.name,
+															data: ohlc
+													}]
+											});
+        });
+
+        });
+      </script>
+
+
+    </body>
+</html>
