@@ -133,6 +133,7 @@ Mongodb.prototype.getStcoksByDate = function(type, date) {
         })
         .toArray().then(function(doc) {
           if (doc) {
+            console.log("doc", doc);
             resolve(doc[0].stocks[0].data);
           } else {
             resolve([]);

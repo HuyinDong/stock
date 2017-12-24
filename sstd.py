@@ -1,6 +1,8 @@
 from pymongo import MongoClient
 import datetime
 
+# calculate average price based on day and current date
+
 
 def calculateMA(period, deadline, arr):
     length = len(arr)
@@ -10,6 +12,8 @@ def calculateMA(period, deadline, arr):
     for ele in arr[(length - period - deadline):(length - deadline)]:
         aggregate = aggregate + ele["close"]
     return round(aggregate / period, 2)
+
+# is stock zhangting
 
 
 def isZhangting(period, arr):
@@ -31,31 +35,50 @@ client = MongoClient("mongodb://localhost:27017")
 db = client.stock
 cursor = db.stock.find({})
 stocks = []
-now = datetime.datetime.now()
+
+
+currentSh = db.indexes.find_one({"code": "sh000001"})
+# get latest date
+print currentSh
+today = currentSh["data"].pop()["date"]
+print today
 
 for doc in cursor:
     stockCode = str(doc["code"])
     data = doc["data"]
     if len(data) == 0:
         continue
+    # calculate latest 8 days average price
     ma8 = calculateMA(8, 0, data)
+    # calculate latest 13 days average price
     ma13 = calculateMA(13, 0, data)
+    # calculate latest 21 days average price
     ma21 = calculateMA(21, 0, data)
 
+    # calculate 8 days average price 5 days ago
     ma8_5 = calculateMA(8, 4, data)
+    # calculate latest 13 days average price 5 days ago
     ma13_5 = calculateMA(13, 4, data)
+    # calculate latest 21 days average price 5 days ago
     ma21_5 = calculateMA(21, 4, data)
 
+    # calculate 8 days average price 8 days ago
     ma8_8 = calculateMA(8, 7, data)
+    # calculate 13 days average price 8 days ago
     ma13_8 = calculateMA(13, 7, data)
+    # calculate 21 days average price 8 days ago
     ma21_8 = calculateMA(21, 7, data)
 
+    # is stock at the trend of going up
     isShangsheng = ma8 > ma13 and ma13 > ma21 and ma8_5 > ma13_5 and ma13_5 > ma21_5 and ma8_8 > ma13_8 and ma8_8 > ma21_8
     last = data[len(data) - 1]
+    date = last["date"]
+    # the volumn should be higher than 1000 million
     isVol = last["vol"] > 100000000
-    date = last["date"].split('/')
-    isNotTingpai = date[0] == str(now.year) and date[1] == str(
-        now.month) and date[2] == str(now.day)
+
+    # the stock should not be stopped
+    isNotTingpai = date == today
+    print isNotTingpai
     # if stockCode == "002302":
     #     print isZhangting(18,data)
     #     print isShangsheng
@@ -64,10 +87,11 @@ for doc in cursor:
 
 
 obj = {
-    "date": str(now.year) + "/" + str(now.month) + "/" + str(now.day),
+    "date": date,
     "data": stocks
 }
 
+# update or insert new one
 result = db.model.find_one({"type": "sstd"})
 if result is None:
     db.model.insert_one({

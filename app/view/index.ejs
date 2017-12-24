@@ -284,7 +284,7 @@
         type:$scope.type,
         date :date
       }}).then(function(data){
-
+        console.log(data);
         for(var i = 0 ; i < data.data.length; i++){
            for(var j = 0; j<data.data[i].data.length;j++){
              if(data.data[i].data[j].date == date){
@@ -295,7 +295,7 @@
            var length = data.data[i].data.length;
            var m = 0;
            while(m < 6-length){
-            data.data[i].data.push({rate:'null',close:'null',high:'null'});
+            data.data[i].data.push({rate:'null',close:'null',high:'null',open:'null',low:'null'});
             m++;
            }
         }
