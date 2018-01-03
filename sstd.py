@@ -99,13 +99,16 @@ if result is None:
         "stocks": [obj]
     })
 else:
-    db.model.update_one({
-        "type": "sstd"
-    }, {
-        "$push": {
-            "stocks": obj
-        }
-    })
+    # check if sstd has been run
+    latest = result["stocks"].pop()
+    if latest["date"] != date:
+        db.model.update_one({
+            "type": "sstd"
+        }, {
+            "$push": {
+                "stocks": obj
+            }
+        })
 
 # need to fix
 # 1. unique index

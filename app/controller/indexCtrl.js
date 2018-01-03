@@ -42,6 +42,10 @@ IndexCtrl.prototype.getStcoksByDate = function(req, res, next) {
   var type = req.query.type;
   var date = req.query.date;
   var suitable = [];
+  // var arr = date.split('/');
+  // var month = parseInt(arr[1]) < 10 ? '0' + arr[1] : arr[1];
+  // var day = parseInt(arr[2]) < 10 ? '0' + arr[2] : arr[2];
+  // date = arr[0] + "/" + month + "/" + day;
   var promise = database.getStcoksByDate(type, date);
   promise.then(function(doc) {
     if (doc) {

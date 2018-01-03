@@ -278,6 +278,10 @@
 
                       $scope.go = function(){
                         var date = ($scope.date.getYear()+1900)+"/"+($scope.date.getMonth()+1)+"/"+$scope.date.getDate();
+                        var arr = date.split('/');
+                        var month = parseInt(arr[1]) < 10 ? '0' + arr[1] : arr[1];
+                        var day = parseInt(arr[2]) < 10 ? '0' + arr[2] : arr[2];
+                        date = arr[0] + "/" + month + "/" + day;
                         console.log(date);
                         $http.get('/stocks/type/date', {
       params: {
@@ -287,6 +291,8 @@
         console.log(data);
         for(var i = 0 ; i < data.data.length; i++){
            for(var j = 0; j<data.data[i].data.length;j++){
+             console.log(data.data[i].data[j].date);
+             console.log("date",date);
              if(data.data[i].data[j].date == date){
                 data.data[i].data = data.data[i].data.slice(j,j+6);
                 break;

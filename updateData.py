@@ -18,7 +18,8 @@ def getInfo(stockCode, dbname):
     newUrl = url + newStockCode
     try:
         print "request started..."
-        req = requests.get(newUrl).text
+        print newUrl
+        req = requests.get(newUrl, timeout=2).text
         print "111"
         content = req.split(',')
         print "222"
@@ -82,6 +83,7 @@ def getInfo(stockCode, dbname):
     except:
         print "Error: unable to fecth stock data"
         print "another try"
+        time.sleep(2)
         # if failed, try again
         getInfo(stockCode, dbname)
 

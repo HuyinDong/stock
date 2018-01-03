@@ -3,7 +3,7 @@ var MongoClient = mongo.MongoClient;
 var database;
 
 function Mongodb() {
-  MongoClient.connect("mongodb://localhost:27017/stock", function(err, dbb) {
+  MongoClient.connect("mongodb://192.168.188.223:27017/stock", function(err, dbb) {
     if (dbb == null) {
       console.log("连接数据库不成功。仅能使用缓存功能。");
       return -1;
@@ -18,7 +18,7 @@ function Mongodb() {
  */
 function connection(callback) {
   if (!database) {
-    MongoClient.connect("mongodb://localhost:27017/stock", function(err, dbb) {
+    MongoClient.connect("mongodb://192.168.188.223:27017/stock", function(err, dbb) {
       if (dbb == null) {
         console.log("连接数据库不成功。仅能使用缓存功能。");
         return -1;
