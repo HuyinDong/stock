@@ -38,6 +38,24 @@ IndexCtrl.prototype.getManyStocksBycodes = function(req, res, next) {
   });
 }
 
+IndexCtrl.prototype.getStcoksByPreviousDate = function(req, res, next) {
+  var type = req.query.type;
+  var date = req.query.date;
+  var promise = database.getModelByType(type);
+  promise.then(function(doc) {
+    doc.stocks.forEach(function(ele) {
+      if (ele.date == date) {
+        res.json(ele);
+        return;
+      }
+    });
+    res.json({
+      date: date,
+      data: []
+    });
+  });
+}
+
 IndexCtrl.prototype.getStcoksByDate = function(req, res, next) {
   var type = req.query.type;
   var date = req.query.date;

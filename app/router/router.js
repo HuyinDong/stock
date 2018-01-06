@@ -9,4 +9,5 @@ module.exports = function(app) {
   app.get('/manystocks', IndexCtrl.getManyStocksBycodes);
   app.get('/allmodels', IndexCtrl.getModels);
   app.get('/stocks/type/date', IndexCtrl.getStcoksByDate);
+  app.get('/previousstocks/type/date', IndexCtrl.getStcoksByPreviousDate);
 };
