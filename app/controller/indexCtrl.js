@@ -43,16 +43,25 @@ IndexCtrl.prototype.getStcoksByPreviousDate = function(req, res, next) {
   var date = req.query.date;
   var promise = database.getModelByType(type);
   promise.then(function(doc) {
-    doc.stocks.forEach(function(ele) {
-      if (ele.date == date) {
-        res.json(ele);
-        return;
-      }
-    });
-    res.json({
-      date: date,
-      data: []
-    });
+    console.log(doc.stocks);
+    if (doc) {
+      doc[0].stocks.forEach(function(ele, index) {
+        if (ele.date == date) {
+          console.log("index", index);
+          res.json(doc[0].stocks[index - 1]);
+          return;
+        }
+      });
+      res.json({
+        date: date,
+        data: []
+      });
+    } else {
+      res.json({
+        date: date,
+        data: []
+      });
+    }
   });
 }
 

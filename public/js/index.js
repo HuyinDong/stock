@@ -14,89 +14,99 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
     var month = parseInt(arr[1]) < 10 ? '0' + arr[1] : arr[1];
     var day = parseInt(arr[2]) < 10 ? '0' + arr[2] : arr[2];
     date = arr[0] + "/" + month + "/" + day;
-    $http.get('/stocks/type/date', {
+    var params = {
       params: {
         type: $scope.type,
         date: date
       }
-    }).then(function(data) {
-      var data = data;
-      var ratioValue = $("input[type=radio][name=selection]:checked").val();
-      //对数据进行处理
-      switch (ratioValue) {
-        case 'all':
-          data = getAll(data, date);
-          break;
-        case 'less':
-          data = getLess(data, date);
-          break;
-        case 'more':
-          data = getMore(data, date);
-          break;
-        case 'volumnHighest':
-          var volumnHighest = $("input[type=text][name=volumnHighest]").val();
+    };
+    $http.get('/stocks/type/date', params).then(function(data) {
 
-          data = getVolumnHighest(data, date, volumnHighest);
-          break;
-        case 'volumnHigher':
-          var volumnHigher = $("input[type=text][name=volumnHigher]").val();
-          console.log("1", $scope.isVolumnHigherchecked);
-          console.log("2", $scope.isVolumnHighestchecked);
-          data = getVolumnHigher(data, date, volumnHigher);
-          break;
-      }
+      $http.get('/previousstocks/type/date', params).then(function(previousData) {
+        console.log("1111data", data);
+        console.log("previousData", previousData);
+        data = data.data;
+        previousData = previousData.data;
+        var ratioValue = $("input[type=radio][name=selection]:checked").val();
+        //对数据进行处理
+        var chunkedData = chunkData(data, date);
+        console.log("ratiovalue", ratioValue);
+        switch (ratioValue) {
+          case 'all':
 
+            break;
+          case 'less':
+            console.log("1");
+            data = getLess(chunkedData, previousData.data);
+            break;
+          case 'more':
+            data = getMore(data, date);
+            break;
+          case 'volumnHighest':
+            var volumnHighest = $("input[type=text][name=volumnHighest]").val();
 
+            data = getVolumnHighest(data, date, volumnHighest);
+            break;
+          case 'volumnHigher':
+            var volumnHigher = $("input[type=text][name=volumnHigher]").val();
+            console.log("1", $scope.isVolumnHigherchecked);
+            console.log("2", $scope.isVolumnHighestchecked);
+            data = getVolumnHigher(data, date, volumnHigher);
+            break;
+        }
+        console.log("2");
+        console.log("1111", data);
+        //开始生成表格
+        if (table) {
+          table.destroy();
+        }
 
-      //开始生成表格
-      if (table) {
-        table.destroy();
-      }
-      console.log("data", data);
-      table = $('#ongoing').DataTable({
-        data: data.data,
-        // order: [
-        //     [2, "desc"]
-        // ],
-        "pagingType": "full_numbers",
-        columns: [{
-            "data": "code",
-            "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
-              $(nTd).html(date);
+        table = $('#ongoing').DataTable({
+          data: data,
+          // order: [
+          //     [2, "desc"]
+          // ],
+          "pagingType": "full_numbers",
+          columns: [{
+              "data": "code",
+              "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+                $(nTd).html(date);
+              }
+            }, {
+              "data": "code"
+            },
+            {
+              "data": "name",
+              "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+                var ccode = _.find(data, function(ele) {
+                  return ele.code == oData.code;
+                })
+                var url = "JavaScript:newPopup('/detail?code=" + ccode.code + "&date=" + date + "');";
+                $(nTd).html("<a href=" + url + ">" + oData.name + "</a>");
+              }
+            }, {
+              "data": "data.0.rate"
+            }, {
+              "data": "data.1.rate"
+            }, {
+              "data": "data.2.rate"
+            }, {
+              "data": "data.3.rate"
+            }, {
+              "data": "data.4.rate"
+            }, {
+              "data": "data.5.rate"
+            }, {
+              "data": "data.1.open"
+            }, {
+              "data": "data.2.high"
+            }, {
+              "data": "data.5.close"
             }
-          }, {
-            "data": "code"
-          },
-          {
-            "data": "name",
-            "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
-              var ccode = _.find(data.data, function(ele) {
-                return ele.code == oData.code;
-              })
-              var url = "JavaScript:newPopup('/detail?code=" + ccode.code + "&date=" + date + "');";
-              $(nTd).html("<a href=" + url + ">" + oData.name + "</a>");
-            }
-          }, {
-            "data": "data.0.rate"
-          }, {
-            "data": "data.1.rate"
-          }, {
-            "data": "data.2.rate"
-          }, {
-            "data": "data.3.rate"
-          }, {
-            "data": "data.4.rate"
-          }, {
-            "data": "data.5.rate"
-          }, {
-            "data": "data.1.open"
-          }, {
-            "data": "data.2.high"
-          }, {
-            "data": "data.5.close"
-          }
-        ]
+          ]
+        });
       });
+
     });
   };
 
@@ -107,9 +117,9 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
   }
 
   $("input[type=radio][name=selection]").change(function() {
-    console.log("run");
+
     var value = $("input[type=radio][name=selection]:checked").val();
-    console.log(value);
+
     if (value == 'volumnHigher') {
       $scope.isVolumnHigherchecked = true;
       $scope.isVolumnHighestchecked = false;
@@ -120,60 +130,107 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
       $scope.isVolumnHigherchecked = false;
       $scope.isVolumnHighestchecked = false;
     }
-    console.log("1", $scope.isVolumnHigherchecked);
-    console.log("2", $scope.isVolumnHighestchecked);
   });
 
+  // function getAll(data, date) {
+  //   for (var i = 0; i < data.data.length; i++) {
+  //     for (var j = 0; j < data.data[i].data.length; j++) {
+  //       console.log(data.data[i].data[j].date);
+  //       console.log("date", date);
+  //       if (data.data[i].data[j].date == date) {
+  //         data.data[i].data = data.data[i].data.slice(j, j + 6);
+  //         break;
+  //       }
+  //     }
+  //     var length = data.data[i].data.length;
+  //     var m = 0;
+  //     while (m < 6 - length) {
+  //       data.data[i].data.push({
+  //         rate: 'null',
+  //         close: 'null',
+  //         high: 'null',
+  //         open: 'null',
+  //         low: 'null'
+  //       });
+  //       m++;
+  //     }
+  //   }
+  //   return data;
+  // }
+
+  //截取输入日期之后6日的数据，如果不足的补足为空
+  function chunkData(data, date) {
+    console.log("data222", data);
+    for (var i = 0; i < data.length; i++) {
+      for (var j = 0; j < data[i].data.length; j++) {
+        console.log(data[i].data[j].date);
+        console.log("date", date);
+        if (data[i].data[j].date == date) {
+          data[i].data = data[i].data.slice(j, j + 6);
+          break;
+        }
+      }
+      var length = data[i].data.length;
+      var m = 0;
+      while (m < 6 - length) {
+        data[i].data.push({
+          rate: 'null',
+          close: 'null',
+          high: 'null',
+          open: 'null',
+          low: 'null'
+        });
+        m++;
+      }
+    }
+    return data;
+  }
+
+  function getLess(data, previousData) {
+    var diff = getDiff(data, previousData);
+    return diff;
+  };
+
+  function getMore(data, date) {
+    console.log("more", data);
+    return data;
+  };
+
+  function getVolumnHigher(data, date, volumnHigher) {
+    console.log("volumnHigher", data);
+    console.log(volumnHigher);
+    return data;
+  };
+
+  function getVolumnHighest(data, date, volumnHighest) {
+    console.log("volumnHighest", data);
+    console.log(volumnHighest);
+    return data;
+  };
 
 });
 
-function getAll(data, date) {
-  for (var i = 0; i < data.data.length; i++) {
-    for (var j = 0; j < data.data[i].data.length; j++) {
-      console.log(data.data[i].data[j].date);
-      console.log("date", date);
-      if (data.data[i].data[j].date == date) {
-        data.data[i].data = data.data[i].data.slice(j, j + 6);
-        break;
+function getDiff(arr1, arr2) {
+  console.log("arr2", arr2);
+  var diff = [];
+  var temp1 = arr1.sort();
+  var temp2 = arr2.sort();
+  console.log("temp1", temp1);
+  console.log("temp2", temp2);
+  var isIn = false;
+  for (var i = 0; i < temp1.length; i++) {
+    for (var j = 0; j < temp2.length; j++) {
+      if (temp2[j] == temp1[i].code) {
+        isIn = true;
       }
     }
-    var length = data.data[i].data.length;
-    var m = 0;
-    while (m < 6 - length) {
-      data.data[i].data.push({
-        rate: 'null',
-        close: 'null',
-        high: 'null',
-        open: 'null',
-        low: 'null'
-      });
-      m++;
+    if (!isIn) {
+      diff.push(temp1[i]);
     }
+    isIn = false;
   }
-  return data;
+  return diff;
 }
-
-function getLess(data, date) {
-  console.log("less", data);
-  return data;
-};
-
-function getMore(data, date) {
-  console.log("more", data);
-  return data;
-};
-
-function getVolumnHigher(data, date, volumnHigher) {
-  console.log("volumnHigher", data);
-  console.log(volumnHigher);
-  return data;
-};
-
-function getVolumnHighest(data, date, volumnHighest) {
-  console.log("volumnHighest", data);
-  console.log(volumnHighest);
-  return data;
-};
 
 function calculateStatistics(data) {
 
