@@ -7,7 +7,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
   $http.get('/allmodels').then(function(data) {
     $scope.types = data.data;
   });
-
+  var currentData;
   $scope.go = function() {
     var date = ($scope.date.getYear() + 1900) + "/" + ($scope.date.getMonth() + 1) + "/" + $scope.date.getDate();
     var arr = date.split('/');
@@ -30,6 +30,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
         var ratioValue = $("input[type=radio][name=selection]:checked").val();
         //对数据进行处理
         var chunkedData = chunkData(data, date);
+        previousData = chunkData(previousData, date);
         console.log("ratiovalue", ratioValue);
         switch (ratioValue) {
           case 'all':
@@ -37,10 +38,11 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
             break;
           case 'less':
             console.log("1");
-            data = getLess(chunkedData, previousData.data);
+            console.log(previousData);
+            data = getLess(chunkedData, previousData);
             break;
           case 'more':
-            data = getMore(data, date);
+            data = getMore(chunkedData, previousData);
             break;
           case 'volumnHighest':
             var volumnHighest = $("input[type=text][name=volumnHighest]").val();
@@ -60,7 +62,8 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
         if (table) {
           table.destroy();
         }
-
+        currentData = data;
+        console.log("currentData", currentData);
         table = $('#ongoing').DataTable({
           data: data,
           // order: [
@@ -116,6 +119,24 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
     //$('.modal-body').modal('show', {backdrop: 'static'});
   }
 
+  $scope.downloadCSV = function(args) {
+    var data, filename, link;
+    var csv = convertDataToCSV(currentData);
+    if (csv == null) return;
+
+    filename = args.filename || 'export.csv';
+
+    if (!csv.match(/^data:text\/csv/i)) {
+      csv = 'data:text/csv;charset=utf-8,' + csv;
+    }
+    data = encodeURI(csv);
+
+    link = document.createElement('a');
+    link.setAttribute('href', data);
+    link.setAttribute('download', filename);
+    link.click();
+  };
+
   $("input[type=radio][name=selection]").change(function() {
 
     var value = $("input[type=radio][name=selection]:checked").val();
@@ -161,15 +182,22 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
   //截取输入日期之后6日的数据，如果不足的补足为空
   function chunkData(data, date) {
     console.log("data222", data);
+    var isFound = false;
     for (var i = 0; i < data.length; i++) {
       for (var j = 0; j < data[i].data.length; j++) {
         console.log(data[i].data[j].date);
         console.log("date", date);
         if (data[i].data[j].date == date) {
           data[i].data = data[i].data.slice(j, j + 6);
+          isFound = true;
           break;
         }
       }
+      //若没找到，说明停牌了
+      if (!isFound) {
+        data[i].data = [];
+      }
+
       var length = data[i].data.length;
       var m = 0;
       while (m < 6 - length) {
@@ -182,18 +210,17 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
         });
         m++;
       }
+      isFound = false;
     }
     return data;
   }
 
   function getLess(data, previousData) {
-    var diff = getDiff(data, previousData);
-    return diff;
+    return getDiff(previousData, data);
   };
 
-  function getMore(data, date) {
-    console.log("more", data);
-    return data;
+  function getMore(data, previousData) {
+    return getDiff(data, previousData);
   };
 
   function getVolumnHigher(data, date, volumnHigher) {
@@ -220,7 +247,7 @@ function getDiff(arr1, arr2) {
   var isIn = false;
   for (var i = 0; i < temp1.length; i++) {
     for (var j = 0; j < temp2.length; j++) {
-      if (temp2[j] == temp1[i].code) {
+      if (temp2[j].code == temp1[i].code) {
         isIn = true;
       }
     }
@@ -235,3 +262,12 @@ function getDiff(arr1, arr2) {
 function calculateStatistics(data) {
 
 };
+
+function convertDataToCSV(data) {
+  var csv = "";
+  console.log("data,,,111", data);
+  data.forEach(function(ele) {
+    csv += ele.code + '\n';
+  });
+  return csv;
+}
