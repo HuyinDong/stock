@@ -149,7 +149,7 @@
                           </label>
                           </div>
                         </div>
-                        <input type="text" class="form-control" name="volumnHighest" ng-disabled="isVolumnHighestchecked">
+                        <input type="text" class="form-control" name="volumnHighest" ng-disabled="!isVolumnHighestchecked">
                       </div>
                     </div>
                     <div class="col-xs-3">
@@ -162,7 +162,7 @@
                         </label>
                           </div>
                         </div>
-                        <input type="text" class="form-control" name="volumnHigher" ng-disabled="isVolumnHigherchecked">
+                        <input type="text" class="form-control" name="volumnHigher" ng-disabled="!isVolumnHigherchecked">
                       </div>
                     </div>
                     <div class="col-xs-3">
@@ -171,6 +171,7 @@
 
                       <div class="col-xs-3">
                         <button class="btn btn-info btn-flat" ng-click = "downloadCSV({ filename: 'stock-data.csv' })">导出列表</button>
+                      
                       </div>
                   </div>
                 </div>
