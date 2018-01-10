@@ -7,6 +7,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
   $http.get('/allmodels').then(function(data) {
     $scope.types = data.data;
   });
+  //储存列表数据
   var currentData;
   $scope.go = function() {
     var date = ($scope.date.getYear() + 1900) + "/" + ($scope.date.getMonth() + 1) + "/" + $scope.date.getDate();
@@ -21,7 +22,6 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
       }
     };
     $http.get('/stocks/type/date', params).then(function(data) {
-
       $http.get('/previousstocks/type/date', params).then(function(previousData) {
         console.log("1111data", data);
         console.log("previousData", previousData);
@@ -51,19 +51,15 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
             break;
           case 'volumnHigher':
             var volumnHigher = $("input[type=text][name=volumnHigher]").val();
-            console.log("1", $scope.isVolumnHigherchecked);
-            console.log("2", $scope.isVolumnHighestchecked);
             data = getVolumnHigher(data, date, volumnHigher);
             break;
         }
-        console.log("2");
-        console.log("1111", data);
+
         //开始生成表格
         if (table) {
           table.destroy();
         }
         currentData = data;
-        console.log("currentData", currentData);
         table = $('#ongoing').DataTable({
           data: data,
           // order: [
@@ -113,34 +109,32 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
     });
   };
 
+  //跳转查看明细
   $scope.goDetail = function(code) {
     $('.modal-body').html(code);
     console.log("run");
     //$('.modal-body').modal('show', {backdrop: 'static'});
   }
 
+  //将入选股票转化为csv格式下载
   $scope.downloadCSV = function(args) {
     var data, filename, link;
     var csv = convertDataToCSV(currentData);
     if (csv == null) return;
-
     filename = args.filename || 'export.csv';
-
     if (!csv.match(/^data:text\/csv/i)) {
       csv = 'data:text/csv;charset=utf-8,' + csv;
     }
     data = encodeURI(csv);
-
     link = document.createElement('a');
     link.setAttribute('href', data);
     link.setAttribute('download', filename);
     link.click();
   };
 
+  //当选项改变的时候运行该事件
   $("input[type=radio][name=selection]").change(function() {
-
     var value = $("input[type=radio][name=selection]:checked").val();
-
     if (value == 'volumnHigher') {
       $scope.isVolumnHigherchecked = true;
       $scope.isVolumnHighestchecked = false;
@@ -215,20 +209,24 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
     return data;
   }
 
+  //当选择‘相比昨天减少的股’时运行
   function getLess(data, previousData) {
     return getDiff(previousData, data);
   };
 
+  //当选择'相比昨天增加的股'时运行
   function getMore(data, previousData) {
     return getDiff(data, previousData);
   };
 
+  //当选择'成交量高于多少'时运行
   function getVolumnHigher(data, date, volumnHigher) {
     console.log("volumnHigher", data);
     console.log(volumnHigher);
     return data;
   };
 
+  //当选择'成交量排名前多少'时运行
   function getVolumnHighest(data, date, volumnHighest) {
     console.log("volumnHighest", data);
     console.log(volumnHighest);
@@ -237,6 +235,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
 
 });
 
+//找出两个数组中不同的项
 function getDiff(arr1, arr2) {
   console.log("arr2", arr2);
   var diff = [];
@@ -259,13 +258,14 @@ function getDiff(arr1, arr2) {
   return diff;
 }
 
+//统计用，现在还没写
 function calculateStatistics(data) {
 
 };
 
+//将列表数据转换为csv格式
 function convertDataToCSV(data) {
   var csv = "";
-  console.log("data,,,111", data);
   data.forEach(function(ele) {
     csv += ele.code + '\n';
   });
