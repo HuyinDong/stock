@@ -17,6 +17,7 @@ IndexCtrl.prototype.getStockByCode = function(req, res, next) {
   var code = req.query.code;
   var promise = database.getStockByCode(code);
   promise.then(function(doc) {
+    console.log("dpc", doc);
     res.json(doc);
   });
 };
@@ -43,17 +44,24 @@ IndexCtrl.prototype.getStcoksByPreviousDate = function(req, res, next) {
   var date = req.query.date;
   var promise = database.getModelByType(type);
   promise.then(function(doc) {
-    console.log("stocks", doc.stocks);
+    console.log("stocks", doc);
     if (doc) {
-      doc[0].stocks.forEach(function(ele, index) {
+      doc.forEach(function(ele, index) {
         if (ele.date == date) {
           console.log("index", index);
-          console.log(doc[0].stocks[index - 1]);
-          database.getManyStocksBycodes(doc[0].stocks[index - 1].data).then(function(doc) {
-            console.log(doc);
-            res.json(doc);
+          console.log(doc[index - 1]);
+          if (index == 0) {
+            res.json({
+              date: date,
+              data: []
+            });
             return;
-          })
+          } else {
+            database.getManyStocksBycodes(doc[index - 1].data).then(function(doc) {
+              console.log("get previous by date run");
+              res.json(doc);
+            })
+          }
         }
       });
     } else {
@@ -63,6 +71,7 @@ IndexCtrl.prototype.getStcoksByPreviousDate = function(req, res, next) {
       });
     }
   });
+
 }
 
 IndexCtrl.prototype.getStcoksByDate = function(req, res, next) {
@@ -73,36 +82,47 @@ IndexCtrl.prototype.getStcoksByDate = function(req, res, next) {
   // var month = parseInt(arr[1]) < 10 ? '0' + arr[1] : arr[1];
   // var day = parseInt(arr[2]) < 10 ? '0' + arr[2] : arr[2];
   // date = arr[0] + "/" + month + "/" + day;
+  console.log("run...");
   var promise = database.getStcoksByDate(type, date);
   promise.then(function(doc) {
+    console.log("doc1", doc);
     if (doc) {
       var stocks = doc;
-      console.log(stocks);
+      //console.log("stocks", stocks);
       var ret = database.getManyStocksBycodes(stocks);
+      console.log("asdasfasdasdasd");
       ret.then(function(doc2) {
-        //   var count = 6;
-        //   var isRun = false;
-        //   doc2.forEach(function(ele){
-        //       for (var info of ele.data) {
-        //       if(info.date == date){
-        //         isRun = true;
-        //       }
-        //       if(isRun){
-        //         suitable.push(info);
-        //         count--;
-        //       }
-        //       if(count <0){
-        //         isRun = false;
-        //         console.log(suitable);
-        //         info.data = suitable;
-        //         suitable = [];
-        //         count = 6;
-        //         break;
-        //       }
+        console.log(doc2.length);
+        var count = 6;
+        var isRun = false;
+        // doc2.forEach(function(ele) {
+        //   for (var info of ele.data) {
+        //     if (info.date == date) {
+        //       isRun = true;
         //     }
-        //   })
+        //     if (isRun) {
+        //       suitable.push(info);
+        //       count--;
+        //     }
+        //     if (count < 0) {
+        //       isRun = false;
+        //       //console.log(suitable);
+        //       info.data = suitable;
+        //       suitable = [];
+        //       count = 6;
+        //       break;
+        //     }
+        //   }
+        // })
+        console.log("doc2", doc2);
+
         res.json(doc2);
       });
+    } else {
+      console.log("null run");
+      res.json({
+        data: ''
+      })
     }
   });
 }

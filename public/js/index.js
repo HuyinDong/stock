@@ -5,6 +5,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
   $scope.isVolumnHigherchecked = false;
   $scope.isVolumnHighestchecked = false;
   $http.get('/allmodels').then(function(data) {
+    console.log("type", data);
     $scope.types = data.data;
   });
   //储存列表数据
@@ -17,12 +18,15 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
     date = arr[0] + "/" + month + "/" + day;
     var params = {
       params: {
-        type: $scope.type,
+        type: 'sstd',
         date: date
       }
     };
+
     $http.get('/stocks/type/date', params).then(function(data) {
+      console.log(data);
       $http.get('/previousstocks/type/date', params).then(function(previousData) {
+        console.log(previousData);
         data = data.data;
         previousData = previousData.data;
         var ratioValue = $("input[type=radio][name=selection]:checked").val();
@@ -31,7 +35,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
         previousData = chunkData(previousData, date);
         switch (ratioValue) {
           case 'all':
-
+            console.log("all run");
             break;
           case 'less':
             data = getLess(chunkedData, previousData);
@@ -53,6 +57,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
         if (table) {
           table.destroy();
         }
+        console.log("data", data);
         currentData = data;
         table = $('#ongoing').DataTable({
           data: data,

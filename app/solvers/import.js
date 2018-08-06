@@ -13,6 +13,7 @@ fs.readdir(TEST, (err, files) => {
   files.forEach(function(file, index) {
     //根据文件名解析股票代码
     var code = file.split('#')[1].split('.')[0];
+    var market = file.split('#')[0].toLowerCase();
     //读取单个文件信息
     fs.readFile(TEST + file, (err, data) => {
 
@@ -23,6 +24,11 @@ fs.readdir(TEST, (err, files) => {
       var data = iconv.decode(data, 'gb2312');
       data = data.toString();
       var arr = data.split('\r\n');
+      console.log(code);
+      console.log(market);
+      if (market == 'sh' && code[0] == '0' || market == 'sz' && code[1] == '9') {
+        code = market + code;
+      }
       arr = arr.slice(0, -2);
       var words = arr.shift();
       console.log(words.split(' '));

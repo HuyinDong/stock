@@ -37,11 +37,14 @@ cursor = db.stock.find({})
 stocks = []
 
 
-currentSh = db.indexes.find_one({"code": "sh000001"})
+currentSh = db.stock.find_one({"code": "sh000001"})
 # get latest date
 print currentSh
+# if currentSh is None:
+#    currentSh =
 today = currentSh["data"].pop()["date"]
 print today
+#today = "2018/01/19"
 
 for doc in cursor:
     stockCode = str(doc["code"])
@@ -56,18 +59,18 @@ for doc in cursor:
     ma21 = calculateMA(21, 0, data)
 
     # calculate 8 days average price 5 days ago
-    ma8_5 = calculateMA(8, 4, data)
+    ma8_5 = calculateMA(8, 7, data)
     # calculate latest 13 days average price 5 days ago
-    ma13_5 = calculateMA(13, 4, data)
+    ma13_5 = calculateMA(13, 7, data)
     # calculate latest 21 days average price 5 days ago
-    ma21_5 = calculateMA(21, 4, data)
+    ma21_5 = calculateMA(21, 7, data)
 
     # calculate 8 days average price 8 days ago
-    ma8_8 = calculateMA(8, 7, data)
+    ma8_8 = calculateMA(8, 20, data)
     # calculate 13 days average price 8 days ago
-    ma13_8 = calculateMA(13, 7, data)
+    ma13_8 = calculateMA(13, 20, data)
     # calculate 21 days average price 8 days ago
-    ma21_8 = calculateMA(21, 7, data)
+    ma21_8 = calculateMA(21, 20, data)
 
     # is stock at the trend of going up
     isShangsheng = ma8 > ma13 and ma13 > ma21 and ma8_5 > ma13_5 and ma13_5 > ma21_5 and ma8_8 > ma13_8 and ma8_8 > ma21_8
@@ -78,6 +81,8 @@ for doc in cursor:
 
     # the stock should not be stopped
     isNotTingpai = date == today
+    print date
+    print today
     print isNotTingpai
     # if stockCode == "002302":
     #     print isZhangting(18,data)
@@ -92,23 +97,20 @@ obj = {
 }
 
 # update or insert new one
-result = db.model.find_one({"type": "sstd"})
-if result is None:
-    db.model.insert_one({
-        "type": "sstd",
-        "stocks": [obj]
-    })
-else:
-    # check if sstd has been run
-    latest = result["stocks"].pop()
-    if latest["date"] != date:
-        db.model.update_one({
-            "type": "sstd"
-        }, {
-            "$push": {
-                "stocks": obj
-            }
-        })
+# result = db.sstd.find_one({"type": "sstd"})
+# if result is None:
+db.sstd.insert_one(obj)
+# else:
+#     # check if sstd has been run
+#     latest = result["stocks"].pop()
+#     if latest["date"] != date:
+#         db.model.update_one({
+#             "type": "sstd"
+#         }, {
+#             "$push": {
+#                 "stocks": obj
+#             }
+#         })
 
 # need to fix
 # 1. unique index

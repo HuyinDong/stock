@@ -3,7 +3,7 @@ var MongoClient = mongo.MongoClient;
 var database;
 
 function Mongodb() {
-  MongoClient.connect("mongodb://192.168.188.223:27017/stock", function(err, dbb) {
+  MongoClient.connect("mongodb://localhost:27017/stock", function(err, dbb) {
     if (dbb == null) {
       console.log("连接数据库不成功。仅能使用缓存功能。");
       return -1;
@@ -18,7 +18,7 @@ function Mongodb() {
  */
 function connection(callback) {
   if (!database) {
-    MongoClient.connect("mongodb://192.168.188.223:27017/stock", function(err, dbb) {
+    MongoClient.connect("mongodb://localhost:27017/stock", function(err, dbb) {
       if (dbb == null) {
         console.log("连接数据库不成功。仅能使用缓存功能。");
         return -1;
@@ -79,6 +79,7 @@ Mongodb.prototype.getStockByCode = function(code) {
 };
 
 Mongodb.prototype.getManyStocksBycodes = function(arr) {
+  console.log("get many runs");
   return new Promise(function(resolve, reject) {
     connection(function(database) {
       database.collection('stock').find({
@@ -86,6 +87,7 @@ Mongodb.prototype.getManyStocksBycodes = function(arr) {
           $in: arr
         }
       }).toArray().then(function(doc) {
+        //console.log("doc2333", doc);
         resolve(doc);
       });
     });
@@ -95,10 +97,8 @@ Mongodb.prototype.getManyStocksBycodes = function(arr) {
 Mongodb.prototype.getModelByType = function(type) {
   return new Promise(function(resolve, reject) {
     connection(function(database) {
-      database.collection('model').find({
-        type: type
-      }).toArray().then(function(doc) {
-        console.log("doc", doc);
+      database.collection(type).find().toArray().then(function(doc) {
+        console.log("mpdel doc", doc);
         resolve(doc);
       });
     });
@@ -120,26 +120,23 @@ Mongodb.prototype.getModels = function() {
 
 Mongodb.prototype.getStcoksByDate = function(type, date) {
   console.log("date", date);
+  console.log(type);
   return new Promise(function(resolve, reject) {
     connection(function(database) {
-      database.collection('model').find({
-          type: type
-        }, {
-          stocks: {
-            $elemMatch: {
-              date: date
-            }
-          }
-        })
-        .toArray().then(function(doc) {
-          if (doc) {
-            console.log("doc", doc);
-            resolve(doc[0].stocks[0].data);
-          } else {
-            resolve([]);
-          }
-
-        });
+      database.collection(type).findOne({
+        date: date
+      }).then(function(doc) {
+        console.log("doc", doc);
+        console.log("====================================");
+        if (doc) {
+          console.log("aaaaaa run");
+          console.log("asdf", doc);
+          resolve(doc.data);
+        } else {
+          console.log("doooc run");
+          resolve([]);
+        }
+      });
     });
   });
 }

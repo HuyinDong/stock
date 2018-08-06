@@ -103,9 +103,9 @@ for doc in cursor:
     getInfo(stockCode, "stock")
 
 # update indexes
-indexes = ['sh000001', 'sz399001', 'sz399006']
-for stock in indexes:
-    getInfo(stock, 'indexes')
+# indexes = ['sh000001', 'sz399001', 'sz399006']
+# for stock in indexes:
+#     getInfo(stock, 'indexes')
 
 print "updating ended"
 # need to fix
