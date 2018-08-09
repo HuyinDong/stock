@@ -135,5 +135,29 @@ IndexCtrl.prototype.getModels = function(req, res, next) {
   });
 }
 
+IndexCtrl.prototype.getMylife = function(req, res, next) {
+  res.render('mylife');
+}
 
+IndexCtrl.prototype.getLife = function(req, res, next) {
+  database.getLife().then(function(doc) {
+    res.json(doc);
+  });
+}
+
+IndexCtrl.prototype.insertLife = function(req, res, next) {
+  date = new Date();
+  var point = parseInt(req.query.point);
+  var desc = req.query.desc;
+  console.log(req.query);
+  var obj = {
+    date: (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear(),
+    point: point,
+    desc: desc
+  };
+  database.insertLife(obj);
+  res.json({
+    msg: 'ok'
+  });
+}
 module.exports = new IndexCtrl();

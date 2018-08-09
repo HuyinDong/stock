@@ -5,7 +5,7 @@
 
 	<!-- start: Meta -->
 	<meta charset="utf-8">
-	<title>Smart Exploit</title>
+	<title>Detail</title>
 	<meta name="description" content="Smart Exploit">
 	<meta name="author" content="Smart Exploit">
 	<meta name="keyword" content="Smart Exploit">
@@ -60,8 +60,6 @@
 				  <td> <b>Name:</b> {{data.name}}</td>
 				  <td> <b>Date:</b>  {{data.date}}</td>
 				</tr>
-
-
 			  </tbody>
 			</table>
 
@@ -90,7 +88,6 @@
 			</table>
 		</div>
     <div id = "qtip1" class ="myCustomClass container">
-asdf
     </div>
 	</div>
 
@@ -115,7 +112,6 @@ asdf
         var code = location.search.split('code=')[1];
         var date = location.search.split('date=')[1];
         $http.get('/stocks?code='+code).then(function(data){
-          console.log(data.data);
           $scope.data = data.data[0];
           $scope.data.date = date;
 					// for(var j = 0; j<$scope.data.data.length;j++){

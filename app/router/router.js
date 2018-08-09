@@ -10,4 +10,8 @@ module.exports = function(app) {
   app.get('/allmodels', IndexCtrl.getModels);
   app.get('/stocks/type/date', IndexCtrl.getStcoksByDate);
   app.get('/previousstocks/type/date', IndexCtrl.getStcoksByPreviousDate);
+
+  app.get('/mylife', IndexCtrl.getMylife);
+  app.get('/getlife', IndexCtrl.getLife);
+  app.get('/insertlife', IndexCtrl.insertLife);
 };

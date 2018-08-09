@@ -1,0 +1,91 @@
+<html>
+<head>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css">
+
+
+
+</head>
+<body ng-app='charts' ng-controller = 'chartsCtrl'>
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+  <div class="form-group">
+    <label for="point">point</label>
+    <input type="text" class="form-control" ng-model='content.point'  placeholder="Enter point">
+  </div>
+  <div class="form-group">
+    <label for="desc">Description</label>
+    <input type="text" class="form-control" ng-model='content.desc' placeholder="Enter Description">
+  </div>
+  <button class="btn btn-primary" ng-click= 'addPoint()'>提交</button>
+
+<script src="/lib/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/lib/highcharts/highcharts.js"></script>
+<script src="/lib/highcharts/modules/exporting.js"></script>
+<script src="/lib/angular/angular.min.js"></script>
+<script src="/lib/angular-animate/angular-animate.min.js"></script>
+<script>
+
+var charts = angular.module('charts',[]);
+charts.controller('chartsCtrl',function($scope,$http){
+  //get data
+  $scope.content = {
+    point: 0,
+    desc: ''
+  };
+  $http.get('/getlife').then(function(data){
+    var x = [];
+    var arr = [];
+    data.data.forEach(function(ele){
+      arr.push({
+        y:ele.point,
+        desc : ele.desc
+      });
+      x.push(ele.date);
+    });
+ $(function () {
+   $('#container').highcharts({
+      chart: {
+        type: 'line'
+      },
+      title: {
+        text: 'Life Point'
+      },
+      subtitle: {
+        text: 'A Record to my life'
+      },
+       xAxis: {
+         categories: x
+       },
+      tooltip: {
+         formatter: function () {
+           return this.point.desc;
+       }
+         },
+
+      series: [{
+        data: arr
+      }]
+    });
+  });
+  });
+
+  $scope.addPoint = function(){
+    var params = {
+      params: $scope.content
+    };
+    $http.get('/insertlife',params).then(function(data){
+      if(data){
+        alert("ok");
+        location.reload();
+      }
+    })
+  }
+});
+
+
+
+</script>
+</body>
+</html>

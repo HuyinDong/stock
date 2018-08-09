@@ -141,4 +141,22 @@ Mongodb.prototype.getStcoksByDate = function(type, date) {
   });
 }
 
+
+Mongodb.prototype.getLife = function() {
+  return new Promise(function(resolve, reject) {
+    connection(function(database) {
+      database.collection('life').find().toArray().then(function(doc) {
+        resolve(doc);
+      }, reject);
+    });
+  });
+}
+
+Mongodb.prototype.insertLife = function(obj) {
+  connection(function(database) {
+    database.collection('life').insert(obj);
+  });
+}
+
+
 module.exports = new Mongodb();

@@ -25,13 +25,19 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
 
     $http.get('/stocks/type/date', params).then(function(data) {
       console.log(data);
+      if (data.data.length == 0) {
+        alert("无数据");
+      }
       $http.get('/previousstocks/type/date', params).then(function(previousData) {
-        console.log(previousData);
-        data = data.data;
-        previousData = previousData.data;
+        console.log("prev", previousData);
+        data = data.data || [];
+        previousData = previousData.data.data ? [] : previousData.data;
         var ratioValue = $("input[type=radio][name=selection]:checked").val();
         //对数据进行处理
         var chunkedData = chunkData(data, date);
+        console.log("chunkedData", chunkedData);
+        console.log("previousData", previousData);
+        console.log("======");
         previousData = chunkData(previousData, date);
         switch (ratioValue) {
           case 'all':
@@ -267,6 +273,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
 
 //找出两个数组中不同的项
 function getDiff(arr1, arr2) {
+  console.log("arr2", arr2);
   var diff = [];
   var temp1 = arr1.sort();
   var temp2 = arr2.sort();
