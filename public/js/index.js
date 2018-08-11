@@ -136,11 +136,8 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
 
   //当选项改变的时候运行该事件
   $("input[type=radio][name=selection]").change(function() {
-    console.log("run");
     var value = $("input[type=radio][name=selection]:checked").val();
-    console.log(value);
     if (value == 'volumnHigher') {
-      console.log("run----");
       $scope.$apply(function() {
         $scope.isVolumnHigherchecked = true;
         $scope.isVolumnHighestchecked = false;
@@ -229,7 +226,6 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
 
   //当选择'成交量高于多少'时运行
   function getVolumnHigher(data, volumnHigher) {
-    console.log("data", data);
     data.sort(function(a, b) {
       var valueA = a.data[0].vol || 0;
       var valueB = b.data[0].vol || 0;
@@ -304,7 +300,13 @@ function calculateStatistics(data) {
 function convertDataToCSV(data) {
   var csv = "";
   data.forEach(function(ele) {
-    csv += ele.code + '\n';
+    if (ele.code[0] == '6') {
+      // 将格式转换为直接覆盖通达信软件的格式，上证股票前面加1,深证前面加0
+      csv += '1' + ele.code + '\n';
+    } else {
+      csv += '0' + ele.code + '\n';
+    }
+
   });
   return csv;
 }
