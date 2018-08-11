@@ -22,13 +22,30 @@ def isZhangting(period, arr):
     start = length - period
     if start < 0:
         return False
-    for ele in arr[start:-1]:
+    for ele in arr[start:length]:
         result = (arr[start]["close"] - arr[start - 1]
                   ["close"]) / arr[start - 1]["close"]
         start += 1
         if result > 0.095:
             return True
     return False
+
+# is the price up or down
+
+
+def isYangxian(period, num, arr):
+    yinxian = 0
+    length = len(arr)
+    start = length - period
+    if start < 0:
+        return False
+    for ele in arr[start:length]:
+        if arr[start]["close"] < arr[start]["open"]:
+            yinxian += 1
+        start += 1
+    if yinxian > num:
+        return False
+    return True
 
 
 client = MongoClient("mongodb://localhost:27017")
@@ -51,29 +68,8 @@ for doc in cursor:
     data = doc["data"]
     if len(data) == 0:
         continue
-    # calculate latest 8 days average price
-    ma8 = calculateMA(8, 0, data)
-    # calculate latest 13 days average price
-    ma13 = calculateMA(13, 0, data)
-    # calculate latest 21 days average price
-    ma21 = calculateMA(21, 0, data)
 
-    # calculate 8 days average price 5 days ago
-    ma8_5 = calculateMA(8, 7, data)
-    # calculate latest 13 days average price 5 days ago
-    ma13_5 = calculateMA(13, 7, data)
-    # calculate latest 21 days average price 5 days ago
-    ma21_5 = calculateMA(21, 7, data)
-
-    # calculate 8 days average price 8 days ago
-    ma8_8 = calculateMA(8, 20, data)
-    # calculate 13 days average price 8 days ago
-    ma13_8 = calculateMA(13, 20, data)
-    # calculate 21 days average price 8 days ago
-    ma21_8 = calculateMA(21, 20, data)
-
-    # is stock at the trend of going up
-    isShangsheng = ma8 > ma13 and ma13 > ma21 and ma8_5 > ma13_5 and ma13_5 > ma21_5 and ma8_8 > ma13_8 and ma8_8 > ma21_8
+    # new model can be edited from here
     last = data[len(data) - 1]
     date = last["date"]
     # the volumn should be higher than 1000 million
@@ -81,15 +77,14 @@ for doc in cursor:
 
     # the stock should not be stopped
     isNotTingpai = date == today
-    print date
-    print today
-    print isNotTingpai
+    # print date
+    # print today
+    # print isNotTingpai
     # if stockCode == "002302":
     #     print isZhangting(18,data)
     #     print isShangsheng
-    if isShangsheng and isVol and isZhangting(13, data) and isNotTingpai:
+    if isYangxian(8, 2, data) and isVol and isZhangting(13, data) and isNotTingpai:
         stocks.append(stockCode)
-
 
 obj = {
     "date": date,
@@ -99,7 +94,7 @@ obj = {
 # update or insert new one
 # result = db.sstd.find_one({"type": "sstd"})
 # if result is None:
-db.sstd.insert_one(obj)
+db.nly.insert_one(obj)
 # else:
 #     # check if sstd has been run
 #     latest = result["stocks"].pop()

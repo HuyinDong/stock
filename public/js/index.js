@@ -18,13 +18,11 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
     date = arr[0] + "/" + month + "/" + day;
     var params = {
       params: {
-        type: 'sstd',
+        type: $scope.type,
         date: date
       }
     };
-
     $http.get('/stocks/type/date', params).then(function(data) {
-      console.log(data);
       if (data.data.length == 0) {
         alert("无数据");
       }
@@ -35,9 +33,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
         var ratioValue = $("input[type=radio][name=selection]:checked").val();
         //对数据进行处理
         var chunkedData = chunkData(data, date);
-        console.log("chunkedData", chunkedData);
-        console.log("previousData", previousData);
-        console.log("======");
+
         previousData = chunkData(previousData, date);
         switch (ratioValue) {
           case 'all':
@@ -70,6 +66,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
           // order: [
           //     [2, "desc"]
           // ],
+
           "pagingType": "full_numbers",
           columns: [{
               "data": "code",
@@ -81,6 +78,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
             },
             {
               "data": "name",
+              "width": "8%",
               "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
                 var ccode = _.find(data, function(ele) {
                   return ele.code == oData.code;
@@ -231,6 +229,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
 
   //当选择'成交量高于多少'时运行
   function getVolumnHigher(data, volumnHigher) {
+    console.log("data", data);
     data.sort(function(a, b) {
       var valueA = a.data[0].vol || 0;
       var valueB = b.data[0].vol || 0;
@@ -254,9 +253,11 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
 
   //当选择'成交量排名前多少'时运行
   function getVolumnHighest(data, volumnHighest) {
+
     data.sort(function(a, b) {
-      var valueA = a.data[0].vol || 0;
-      var valueB = b.data[0].vol || 0;
+      var valueA = parseFloat(a.data[0].vol) || 0;
+      var valueB = parseFloat(b.data[0].vol) || 0;
+
       if (valueA < valueB) {
         return 1;
       }
@@ -266,6 +267,8 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
       // names must be equal
       return 0;
     });
+    // var test = _.sortBy(data, parseFloat(data[0].vol));
+    // console.log("test", test);
     data = data.slice(0, parseInt(volumnHighest));
     return data;
   };
@@ -273,7 +276,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
 
 //找出两个数组中不同的项
 function getDiff(arr1, arr2) {
-  console.log("arr2", arr2);
+
   var diff = [];
   var temp1 = arr1.sort();
   var temp2 = arr2.sort();

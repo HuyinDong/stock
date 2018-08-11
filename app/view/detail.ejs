@@ -47,6 +47,7 @@
 </head>
 	<div class="container" ng-app = "stockDetail" ng-controller = "stockDetailController">
 	<hr>
+
 		<div class="col-md-12" align=center>
 			<table class="table table-striped">
 				<thead>
@@ -54,6 +55,7 @@
  				  <th colspan=2>Detail:</th>
 				</tr>
 			  </thead>
+
 			  <tbody>
           <tr>
             <td> <b>Code:</b> {{data.code}}</td>
@@ -62,16 +64,17 @@
 				</tr>
 			  </tbody>
 			</table>
-
+			<div id = "qtip1" class ="myCustomClass container"></div>
 			<table class="table table-striped">
 				<thead>
 				<tr>
-          <th>天数</th>
+          <th>日期</th>
  				  <th>开盘</th>
  				  <th>最高</th>
           <th>最低</th>
           <th>收盘</th>
           <th>涨幅</th>
+					<th>金额</th>
         </tr>
 			  </thead>
 			  <tbody>
@@ -82,13 +85,14 @@
           <td>{{ele.low}}</td>
           <td>{{ele.close}}</td>
           <td>{{ele.rate}}</td>
+					<td>{{ele.vol}}亿</td>
 				</tr>
 
 			  </tbody>
 			</table>
 		</div>
-    <div id = "qtip1" class ="myCustomClass container">
-    </div>
+
+
 	</div>
 
 
@@ -112,7 +116,13 @@
         var code = location.search.split('code=')[1];
         var date = location.search.split('date=')[1];
         $http.get('/stocks?code='+code).then(function(data){
+					for(var t = 0 ; t < data.data[0].data.length;t++){
+							data.data[0].data[t].vol = (parseFloat(data.data[0].data[t].vol)/ Math.pow(10,8)).toFixed(2);
+					}
+
           $scope.data = data.data[0];
+					console.log("data.data",data);
+
           $scope.data.date = date;
 					// for(var j = 0; j<$scope.data.data.length;j++){
 					// 	if($scope.data.data[j].date == date){
@@ -146,15 +156,20 @@
 							var tempDate = $scope.data.data[i].date.split('/');
 							ohlc.push({
 									x:new Date(tempDate[0],parseInt(tempDate[1])-1,tempDate[2]),
+									name: $scope.data.name, // name
 									open: parseFloat($scope.data.data[i].open), // open
 									high: parseFloat($scope.data.data[i].high), // high
 									low: parseFloat($scope.data.data[i].low), // low
 									close: parseFloat($scope.data.data[i].close), // close
+									vol: parseFloat($scope.data.data[i].vol), // vol
+									rate: parseFloat($scope.data.data[i].rate), // rate
 									color: color
 							});
 							volumn.push([new Date(tempDate[0],parseInt(tempDate[1])-1,tempDate[2]),parseFloat($scope.data.data[i].vol)]);
 					}
 					console.log(volumn);
+
+					 $(function () {
 											Highcharts.stockChart('qtip1', {
 													title: {
 															text: $scope.data.code + "  " + $scope.data.name
@@ -174,15 +189,26 @@
 													scrollbar: {
 															enabled: false
 													},
-
+													tooltip:{
+														formatter : function(){
+															return this.points[0].point.x + "<br>"
+																			+ this.points[0].point.name + "<br>"
+																			+ "open:" + this.points[0].point.open + "<br>"
+																			+ "high:" + this.points[0].point.high + "<br>"
+																			+ "low:" + this.points[0].point.low + "<br>"
+																			+ "close:" + this.points[0].point.close + "<br>"
+																			+ "rate:" + this.points[0].point.rate + "%<br>"
+																			+ "vol:" + this.points[0].point.vol + "亿<br>";
+														}
+													},
 													series: [{
 															type: 'candlestick',
 															name: $scope.data.name,
 															data: ohlc
 													}]
 											});
+										});
         });
-
         });
       </script>
 
