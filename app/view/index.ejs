@@ -215,32 +215,27 @@
 
                 <div class="box box-info">
                   <div class="box-header with-border">
-                    <h3 class="box-title">Statistics</h3>
+                    <h3 class="box-title">统计</h3>
                   </div>
                   <div class="box-body">
-                    <table class="table table-bordered display">
-                      <tr>
-                        <td>
-                          <strong>Total : {{statistic.total}}</strong></td>
-                        <td>
-                          <strong>Red : {{statistic.countO_H.Red}}, Green : {{statistic.countO_H.Green}}, Open to High Earning Rate : {{statistic.countO_H.Red/(statistic.countO_H.Red+statistic.countO_H.Green)* 100 | number:2}}%</strong></td>
-                        <td>
-                          <strong>Red : {{statistic.countO_C.Red}}, Green : {{statistic.countO_C.Green}}, Open to Close Earning Rate : {{statistic.countO_C.Red/(statistic.countO_C.Red+statistic.countO_C.Green)* 100 | number:2}}%</strong></td>
-                      </tr>
-                    </table>
                     <table id="statistic" class="table table-bordered display">
                       <thead>
                         <tr>
-                          <th>Date</th>
-                          <th>Names</th>
-                          <th>Open to High Earning Rate</th>
-                          <th>Open to Close Earning Rate</th>
+                          <th>日期</th>
+                          <th>名称</th>
+                          <th>代码</th>
+                          <th>第二天开盘价</th>
+                          <th>第三天卖出价/盈利</th>
+                          <th>第四天卖出价/盈利</th>
+                          <th>第五天卖出价/盈利</th>
+                          <th>第六天卖出价/盈利</th>
                         </tr>
                       </thead>
                     </table>
                   </div>
                 </div>
               </div>
+            </div>
         </section>
 
         </div>

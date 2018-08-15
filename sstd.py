@@ -81,9 +81,7 @@ for doc in cursor:
 
     # the stock should not be stopped
     isNotTingpai = date == today
-    print date
-    print today
-    print isNotTingpai
+
     # if stockCode == "002302":
     #     print isZhangting(18,data)
     #     print isShangsheng

@@ -60,7 +60,8 @@ charts.controller('chartsCtrl',function($scope,$http){
        },
       tooltip: {
          formatter: function () {
-           return this.point.desc;
+
+           return this.y+" , "+this.point.desc;
        }
          },
 

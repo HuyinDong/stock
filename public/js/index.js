@@ -1,6 +1,7 @@
 var stock = angular.module('stock', []);
 var dataset = [];
 var table;
+var table1;
 stock.controller('stockCtrl', function($scope, $http, $compile) {
   $scope.isVolumnHigherchecked = false;
   $scope.isVolumnHighestchecked = false;
@@ -62,7 +63,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
         console.log("data", data);
         currentData = data;
         table = $('#ongoing').DataTable({
-          data: data,
+          data: currentData,
           // order: [
           //     [2, "desc"]
           // ],
@@ -80,7 +81,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
               "data": "name",
               "width": "8%",
               "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
-                var ccode = _.find(data, function(ele) {
+                var ccode = _.find(currentData, function(ele) {
                   return ele.code == oData.code;
                 })
                 var url = "JavaScript:newPopup('/detail?code=" + ccode.code + "&date=" + date + "');";
@@ -107,6 +108,113 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
             }
           ]
         });
+
+
+        //开始生成表格
+        if (table1) {
+          table1.destroy();
+        }
+
+        var statisticData = data;
+        console.log("statisticData", statisticData);
+        table1 = $('#statistic').DataTable({
+          data: statisticData,
+          // order: [
+          //     [2, "desc"]
+          // ],
+
+          "pagingType": "full_numbers",
+          columns: [{
+              "data": "code",
+              "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+                $(nTd).html(date);
+              }
+            }, {
+              "data": "name",
+            }, {
+              "data": "code"
+            },
+            {
+              "data": "data.1.open"
+            }, {
+              "data": "data.2.high",
+              "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+
+                var sell = isNaN(oData.data[2].high) ? oData.data[2].high : (oData.data[2].high * 0.99).toFixed(2);
+                var rate = isNaN(sell) ? oData.data[2].high : (((sell - oData.data[1].open) / oData.data[1].open) * 99).toFixed(2);
+                if (!isNaN(rate)) {
+                  if (rate <= 0) {
+                    $(nTd).css("background-color", "#00ff00");
+                  } else if (rate < 3) {
+                    $(nTd).css("background-color", "#ff3300");
+                  } else {
+                    $(nTd).css("background-color", "#9966ff");
+                  }
+                }
+                console.log(sell);
+                $(nTd).html(sell + "  /  " + rate + "%");
+              }
+            },
+            {
+              "data": "data.3.high",
+              "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+
+                var sell = isNaN(oData.data[3].high) ? oData.data[3].high : (oData.data[3].high * 0.99).toFixed(2);
+                var rate = isNaN(sell) ? oData.data[3].high : (((sell - oData.data[1].open) / oData.data[1].open) * 99).toFixed(2);
+                if (!isNaN(rate)) {
+                  if (rate <= 0) {
+                    $(nTd).css("background-color", "#00ff00");
+                  } else if (rate < 3) {
+                    $(nTd).css("background-color", "#ff3300");
+                  } else {
+                    $(nTd).css("background-color", "#9966ff");
+                  }
+                }
+
+                $(nTd).html(sell + "  /  " + rate + "%");
+              }
+            },
+            {
+              "data": "data.4.high",
+              "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+
+                var sell = isNaN(oData.data[4].high) ? oData.data[4].high : (oData.data[4].high * 0.99).toFixed(2);
+                var rate = isNaN(sell) ? oData.data[4].high : (((sell - oData.data[1].open) / oData.data[1].open) * 99).toFixed(2);
+                if (!isNaN(rate)) {
+                  if (rate <= 0) {
+                    $(nTd).css("background-color", "#00ff00");
+                  } else if (rate < 3) {
+                    $(nTd).css("background-color", "#ff3300");
+                  } else {
+                    $(nTd).css("background-color", "#9966ff");
+                  }
+                }
+
+                $(nTd).html(sell + "  /  " + rate + "%");
+              }
+            },
+            {
+              "data": "data.5.high",
+              "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+
+                var sell = isNaN(oData.data[5].high) ? oData.data[5].high : (oData.data[5].high * 0.99).toFixed(2);
+                var rate = isNaN(sell) ? oData.data[5].high : (((sell - oData.data[1].open) / oData.data[1].open) * 99).toFixed(2);
+                if (!isNaN(rate)) {
+                  if (rate <= 0) {
+                    $(nTd).css("background-color", "#00ff00");
+                  } else if (rate < 3) {
+                    $(nTd).css("background-color", "#ff3300");
+                  } else {
+                    $(nTd).css("background-color", "#9966ff");
+                  }
+                }
+                console.log(sell);
+                $(nTd).html(sell + "  /  " + rate + "%");
+              }
+            }
+          ]
+        });
+
       });
 
     });
@@ -118,7 +226,7 @@ stock.controller('stockCtrl', function($scope, $http, $compile) {
     //$('.modal-body').modal('show', {backdrop: 'static'});
   }
 
-  //将入选股票转化为csv格式下载
+  //将入选股票转化为csv格式下载,下载后直接将TGJ.blk文件拷贝到/T0002/blocknew文件夹下
   $scope.downloadCSV = function(args) {
     var data, filename, link;
     var csv = convertDataToCSV(currentData);
