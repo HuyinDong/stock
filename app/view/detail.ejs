@@ -116,12 +116,13 @@
         var code = location.search.split('code=')[1];
         var date = location.search.split('date=')[1];
         $http.get('/stocks?code='+code).then(function(data){
+					console.log("data.data",data);
 					for(var t = 0 ; t < data.data[0].data.length;t++){
 							data.data[0].data[t].vol = (parseFloat(data.data[0].data[t].vol)/ Math.pow(10,8)).toFixed(2);
 					}
 
           $scope.data = data.data[0];
-					console.log("data.data",data);
+
 
           $scope.data.date = date;
 					// for(var j = 0; j<$scope.data.data.length;j++){
@@ -142,10 +143,11 @@
 									'month', [1, 2, 3, 4, 6]
 							]
 					];
-
+					console.log("line145",$scope.data.data);
 					for (var i = 0; i < $scope.data.data.length; i += 1) {
 
 							var color = "";
+
 							if ($scope.data.data[i].open < $scope.data.data[i].close) {
 									color = "#FF0000";
 							} else if ($scope.data.data[i].open == $scope.data.data[i].close) {
@@ -154,6 +156,7 @@
 									color = "#00FF00";
 							}
 							var tempDate = $scope.data.data[i].date.split('/');
+							console.log("name",$scope.data.name);
 							ohlc.push({
 									x:new Date(tempDate[0],parseInt(tempDate[1])-1,tempDate[2]),
 									name: $scope.data.name, // name
@@ -162,12 +165,14 @@
 									low: parseFloat($scope.data.data[i].low), // low
 									close: parseFloat($scope.data.data[i].close), // close
 									vol: parseFloat($scope.data.data[i].vol), // vol
-									rate: parseFloat($scope.data.data[i].rate), // rate
-									color: color
+									total: parseFloat($scope.data.data[i].rate), // rate
+									color: color,
+									vol : parseFloat($scope.data.data[i].vol)
 							});
+
 							volumn.push([new Date(tempDate[0],parseInt(tempDate[1])-1,tempDate[2]),parseFloat($scope.data.data[i].vol)]);
 					}
-					console.log(volumn);
+					console.log("ohlc",ohlc);
 
 					 $(function () {
 											Highcharts.stockChart('qtip1', {
@@ -189,10 +194,17 @@
 													scrollbar: {
 															enabled: false
 													},
+													plotOptions:{
+														candlestick:{
+															color:'green',
+															upColor:'red'
+														}
+													},
 													tooltip:{
 														formatter : function(){
+															console.log("this",this);
 															return this.points[0].point.x + "<br>"
-																			+ this.points[0].point.name + "<br>"
+																			+ this.points[0].series.name + "<br>"
 																			+ "open:" + this.points[0].point.open + "<br>"
 																			+ "high:" + this.points[0].point.high + "<br>"
 																			+ "low:" + this.points[0].point.low + "<br>"

@@ -3,6 +3,8 @@ var IndexCtrl = require(CONTROLLER + 'indexCtrl');
 module.exports = function(app) {
   app.get('/', IndexCtrl.getFn);
   app.get('/detail', IndexCtrl.getDetail);
+  app.get('/camera', IndexCtrl.getCamera);
+  app.get('/test', IndexCtrl.getTest);
 
   app.get('/stocks', IndexCtrl.getStockByCode);
   app.get('/models', IndexCtrl.getModelByType);

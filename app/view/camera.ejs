@@ -1,0 +1,76 @@
+<html>
+
+<head>
+	<body>
+		<script type="text/javascript" src="/rtmp_player_adobe/scripts/swfobject.js"></script>
+		<script>
+		var queryParameters = new Array();
+    var flashVars = "";
+		var tag = "";
+		var url = "";
+
+
+        function initialise()
+        {
+					queryParameters['source'] = "rtmp://192.168.3.58/myapp"; //"rtmp://183.14.213.223/myapp";//公网用这个
+					queryParameters['type'] = "live";
+					queryParameters['idx'] = 2;
+
+			flashVars += "&src=";
+            flashVars += queryParameters['source'];
+
+            flashVars += "&autoHideControlBar=";
+            flashVars += unescape("true");
+
+            flashVars += "&streamType=";
+            flashVars += queryParameters['type'];
+
+            flashVars += "&autoPlay=";
+            flashVars += unescape("true");
+
+		  flashVars += "&verbose=";
+		  flashVars += "true";
+
+            var soFlashVars = {
+                src: queryParameters['source'],
+			 					streamType: queryParameters['type'],
+                autoPlay: "true",
+                controlBarAutoHide: "true",
+                controlBarPosition: "bottom"
+            };
+
+ 			tag = "&lt;object width='800' height='600' id='StrobeMediaPlayback' name='StrobeMediaPlayback' type='application/x-shockwave-flash' classid='clsid:d27cdb6e-ae6d-11cf-96b8-444553540000' &gt;&lt;param name='movie' value='swfs/StrobeMediaPlayback.swf' /&gt; &lt;param name='quality' value='high' /&gt; &lt;param name='bgcolor' value='#000000' /&gt; &lt;param name='allowfullscreen' value='true' /&gt; &lt;param name='flashvars' value= '"+
+			flashVars+"'/&gt;&lt;embed src='swfs/StrobeMediaPlayback.swf' width='640' height='377' id='StrobeMediaPlayback' quality='high' bgcolor='#000000' name='StrobeMediaPlayback' allowfullscreen='true' pluginspage='http://www.adobe.com/go/getflashplayer'   flashvars='"+ flashVars +"' type='application/x-shockwave-flash'&gt; &lt;/embed&gt;&lt;/object&gt;";
+
+		<!-- For version detection, set to min. required Flash Player version, or 0 (or 0.0.0), for no version detection. -->
+		var swfVersionStr = "10.3.0";
+		<!-- To use express install, set to playerProductInstall.swf, otherwise the empty string. -->
+		var xiSwfUrlStr = "swfs/playerProductInstall.swf";
+		var params = {};
+		params.quality = "high";
+		params.bgcolor = "#000000";
+		params.allowscriptaccess = "sameDomain";
+		params.allowfullscreen = "true";
+		var attributes = {};
+		attributes.id = "StrobeMediaPlayback";
+		attributes.name = "StrobeMediaPlayback";
+		attributes.align = "middle";
+		swfobject.embedSWF("/rtmp_player_adobe/swfs/StrobeMediaPlayback.swf", "flashContent", "800", "600", swfVersionStr, xiSwfUrlStr, soFlashVars, params, attributes);
+		<!-- JavaScript enabled so display the flashContent div in case it is not replaced with a swf object. -->
+		swfobject.createCSS("#flashContent", "display:block;text-align:left;");
+        }
+
+		initialise();
+		</script>
+		<div class = showview>
+	        <div id="flashContent">
+						<p>To view this page ensure that Adobe Flash Player version 10.3.0 or greater is installed.</p>
+			<script type="text/javascript">
+				var pageHost = ((document.location.protocol == "https:") ? "https://" :	"http://");
+				document.write("<a href='http://www.adobe.com/go/getflashplayer'><img src='"
+								+ pageHost + "www.adobe.com/images/shared/download_buttons/get_flash_player.gif' alt='Get Adobe Flash player' /></a>" );
+			</script>
+	        </div>
+			</div>
+		</body>
+		</html>

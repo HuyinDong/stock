@@ -13,6 +13,14 @@ IndexCtrl.prototype.getDetail = function(req, res, next) {
   res.render('detail');
 };
 
+IndexCtrl.prototype.getCamera = function(req, res, next) {
+  res.render('camera');
+};
+
+IndexCtrl.prototype.getTest = function(req, res, next) {
+  res.render('test');
+};
+
 IndexCtrl.prototype.getStockByCode = function(req, res, next) {
   var code = req.query.code;
   var promise = database.getStockByCode(code);
